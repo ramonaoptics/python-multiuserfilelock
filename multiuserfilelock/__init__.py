@@ -25,7 +25,7 @@ if os.name == 'nt':
     # We therefore use the public directory, and create a tempdir in there
     tmpdir = Path(os.environ.get('public', r'C:\Users\Public')) / 'tmp'
 else:
-    tmpdir = tempfile.gettempdir()
+    tmpdir = Path(tempfile.gettempdir())
 
 
 class MultiUserFileLock(FileLock):
