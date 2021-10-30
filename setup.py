@@ -8,6 +8,7 @@ setup(
     url='https://github.com/ramonaoptics/multiuserfilelock',
     author='Ramona Optics, Inc.',
     author_email='info@ramonaoptics.com',
+    description='A lock to share resources between users based on filelock.',
     license='BSD',
     python_requires='>=3.7',
     install_requires=[
