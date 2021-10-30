@@ -1,0 +1,18 @@
+language: python
+python:
+- 3.9
+- 3.8
+- 3.7
+install:
+- pip install -U tox-travis
+script: tox
+deploy:
+  provider: pypi
+  user: __token__
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
+    python: 3.7
+    all_branches: true
+  password:
+    secure: MwPbgpn/l/A2v8yhIf1Cyi+v3uOAQE7T8NOFYluwKditknEimqJSl7dgL3M3roq//0AVvGV466+vcKWjGjK+5wVSSsrfUpwm6vUBiBQcbYDSNnRJgUXcLhqU8FMkSC5B3FR+IfKGgcKBwLJ1zDrFAhCp6okaFF9XKxkYq3AhtHifpcYuEFPnTTGMLI81vEtga34t8jASCGWqQ/1PAKASWAyYhgdJEpo3IWxCRcHpMDrkza3ObYkiBSvN3zfGCJ1DNsBICJJW49rTzOQmhtn/wJ9ABcgVl3SwL85B3OcHYF+0vgYIUEA7SeomIVbYR8sRKduxCJVanWnF7RL+10JXByBRvOYrl8Hz3fJuc/ZqV26E7ac555bnnR53cIm5WyCCv6xUMM2NOAWG4xROnAB94Z7ZoJwmUyVlxOCYAIhIjHzGc2oCVQUjNQtMkg0wMvxG5TgLxuZ7kaA+gmb3xzXCjXfNHdJq1ZxLyaC6RHcX3N+QB2GS0lHhFTlCvRC17QkTgK/kMhkBPtJvpOjOy/C9k/BFm7UDUQd0Cu56ZZiNh5EaeRXQI/QFk2fKXuCqE8myhLBiBCZ5S+qi5Gsc4DCp2GvgBKP+OEay24cjN2O2D/k9TVzWurtFeKjbK90/abDqelAbFncTk1RlLQaTB9tqg9OpUXd1Dgp2fpOn1OxyCb8=

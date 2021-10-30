@@ -1,7 +1,7 @@
 from . import _version
 __version__ = _version.get_versions()['version']
 
-from filelock import FileLock
+from filelock import FileLock, Timeout
 import os
 import shutil
 import tempfile
@@ -80,4 +80,5 @@ class MultiUserFileLock(FileLock):
 
 __all__ = [
     'MultiUserFileLock',
+    'Timeout',
 ]
