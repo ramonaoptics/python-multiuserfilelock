@@ -1,0 +1,5 @@
+*.egg-info
+.pymon
+.tox
+dist
+build
