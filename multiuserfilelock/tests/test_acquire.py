@@ -7,8 +7,8 @@ def test_acquire_lock(tmp_path):
 
     lock1 = MultiUserFileLock(lock_filename)
     lock1.acquire()
-    lock1.release()
     assert lock_filename.exists()
+    lock1.release()
 
     lock2 = MultiUserFileLock(lock_filename)
     lock2.acquire()
