@@ -1,1 +1,1 @@
-filelock
+filelock !=3.11.0
