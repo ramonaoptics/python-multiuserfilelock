@@ -1,6 +1,7 @@
 from . import _version
 __version__ = _version.get_versions()['version']
-
+from packaging.version import Version
+import filelock
 from filelock import FileLock, Timeout
 import os
 import shutil
@@ -39,10 +40,16 @@ class MultiUserFileLock(FileLock):
         self._chmod = chmod
 
         # https://github.com/tox-dev/py-filelock/issues/230
-        super().__init__(*args, thread_local=False, **kwargs)
-        # Will create a ._lock_file object
+        old_version: bool = Version(filelock.__version__) <= Version('3.10.7')
+        kwargs['thread_local'] = not old_version
+
+        super().__init__(*args, **kwargs)
+        # Will create a lock_file object
         # but will not create the files on the file system
-        self._lock_file_path = Path(self._context.lock_file)
+        if old_version:
+            self._lock_file_path = Path(self._lock_file)
+        else:
+            self._lock_file_path = Path(self._context.lock_file)
         parent = self._lock_file_path.parent
         # Even though the "other write" permissions are enabled
         # it seems that the operating systems disables that for the /tmp dir
