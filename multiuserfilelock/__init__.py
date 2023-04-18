@@ -40,8 +40,9 @@ class MultiUserFileLock(FileLock):
         self._chmod = chmod
 
         # https://github.com/tox-dev/py-filelock/issues/230
-        old_version: bool = Version(filelock.__version__) <= Version('3.10.7')
-        kwargs['thread_local'] = not old_version
+        old_version: bool = Version(filelock.__version__) <= Version('3.11.0')
+        if not old_version:
+            kwargs['thread_local'] = False
 
         super().__init__(*args, **kwargs)
         # Will create a lock_file object
