@@ -46,10 +46,10 @@ class MultiUserFileLock(FileLock):
         # Will create a lock_file object
         # but will not create the files on the file system
         if Version(filelock.__version__) <= Version('3.11.0'):
-            self._lock_file_path = self._lock_file
+            self._lock_file_path = Path(self.lock_file)
         else:
-            self._lock_file_path = self._context.lock_file
-        parent = Path(self._lock_file_path).parent
+            self._lock_file_path = Path(self._context.lock_file)
+        parent = self._lock_file_path.parent
         # Even though the "other write" permissions are enabled
         # it seems that the operating systems disables that for the /tmp dir
         parent.mkdir(mode=0o777, parents=True, exist_ok=True)
