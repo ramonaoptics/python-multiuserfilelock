@@ -31,7 +31,6 @@ def test_double_acquire(tmp_path):
 
 
 def test_release_lock_from_different_thread(tmp_path):
-
     results = Queue()
 
     def thread_lock_acquire(filename):
@@ -46,16 +45,12 @@ def test_release_lock_from_different_thread(tmp_path):
     lock_filename = tmp_path / 'test.lock'
     lock_thread = Thread(target=thread_lock_acquire, args=(lock_filename,))
 
-    # 1. Users start the MCAM in the background
-    #     acquire!
     lock_thread.start()
     lock_thread.join(timeout=1)
     assert not lock_thread.is_alive()
     lock = results.get(timeout=1)
     assert lock.is_locked
 
-    # 2. Users closes the MCAM in a different background thread.
-    #     release!
     lock_thread = Thread(target=thread_lock_release, args=(lock,))
     lock_thread.start()
     lock_thread.join(timeout=1)
@@ -63,9 +58,6 @@ def test_release_lock_from_different_thread(tmp_path):
     assert not lock.is_locked
 
     lock_thread2 = Thread(target=thread_lock_acquire, args=(lock_filename,))
-    # 3. Users tries to open the MCAM in a new thread.
-    #     acquire!
-    #    unfortunately, the acquisition fails.
     lock_thread2.start()
     lock_thread2.join(timeout=1)
     assert not lock_thread2.is_alive()
