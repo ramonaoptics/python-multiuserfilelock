@@ -12,7 +12,7 @@ setup(
     license='BSD',
     python_requires='>=3.7',
     install_requires=[
-        'filelock',
+        'filelock!=3.11.0',
     ],
     packages=find_packages(),
     cmdclass=versioneer.get_cmdclass(),
