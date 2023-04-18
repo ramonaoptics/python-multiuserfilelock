@@ -37,10 +37,12 @@ class MultiUserFileLock(FileLock):
             self._user = user
             self._group = group
         self._chmod = chmod
+
+        # https://github.com/tox-dev/py-filelock/issues/230
+        super().__init__(*args, thread_local=False, **kwargs)
         # Will create a ._lock_file object
         # but will not create the files on the file system
-        super().__init__(*args, **kwargs)
-        self._lock_file_path = Path(self._lock_file)
+        self._lock_file_path = Path(self._context.lock_file)
         parent = self._lock_file_path.parent
         # Even though the "other write" permissions are enabled
         # it seems that the operating systems disables that for the /tmp dir
