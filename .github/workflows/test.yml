@@ -11,9 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Uncomment below once tests for filelock 3.11 are fixed
-        # python-version: ['3.7', '3.9', '3.11']
-        python-version: ['3.9']
+        python-version: ['3.7', '3.9', '3.11']
 
     steps:
     - uses: actions/checkout@v1
