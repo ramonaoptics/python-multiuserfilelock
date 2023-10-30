@@ -31,6 +31,21 @@ else:
 
 
 class MultiUserFileLock(FileLock):
+    def __new__(cls, *args, **kwargs):
+        # Can be removed if upstream accepts our fix for this
+        # https://github.com/tox-dev/filelock/pull/284
+        if Version(filelock.__version__) >= Version("3.13.0"):
+            if 'group' in kwargs:
+                kwargs.pop('group')
+            if 'chmod' in kwargs:
+                kwargs.pop('chmod')
+            if 'user' in kwargs:
+                kwargs.pop('user')
+
+            return super().__new__(cls, *args, **kwargs)
+        else:
+            return super().__new__(cls)
+
     def __init__(self, *args, user=None, group=None, chmod=0o666, **kwargs):
         if os.name == 'nt':
             self._user = None
