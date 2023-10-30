@@ -30,7 +30,7 @@ setup(
         'Programming Language :: Python :: 3.12',
     ],
     install_requires=[
-        'filelock!=3.11.0',
+        'filelock!=3.11.0,!=3.13.0',
     ],
     packages=find_packages(),
     cmdclass=versioneer.get_cmdclass(),
