@@ -1,3 +1,8 @@
+## 0.0.9 (2023/10/30)
+
+- Declare package incompatible with filelock 3.13.0. The problematic code was
+  fixed upstream in the released version 3.13.1.
+
 ## 0.0.8 (2023/10/30)
 
 - Fix compatibility with filelock 3.13.0.
