@@ -30,7 +30,7 @@ else:
     tmpdir = Path(tempfile.gettempdir())
 
 
-class MultiUserFileLock(FileLock):
+class MultiUserFileLock:
     def __init__(self, *args, user=None, group=None, chmod=0o666, **kwargs):
         if os.name == 'nt':
             self._user = None
@@ -45,8 +45,8 @@ class MultiUserFileLock(FileLock):
 
         # Will create a ._lock_file object
         # but will not create the files on the file system
-        super().__init__(*args, **kwargs)
-        self._lock_file_path = Path(self.lock_file)
+        self._filelock = FileLock(*args, **kwargs)
+        self._lock_file_path = Path(self._filelock.lock_file)
         parent = self._lock_file_path.parent
         # Even though the "other write" permissions are enabled
         # it seems that the operating systems disables that for the /tmp dir
@@ -60,7 +60,7 @@ class MultiUserFileLock(FileLock):
             shutil.chown(parent, user=self._user)
 
     def acquire(self, *args, **kwargs):
-        super().acquire(*args, **kwargs)
+        self._filelock.acquire(*args, **kwargs)
         # once the lock has been acquired, we are more guaranteed that the
         # _lock_file exists
         if self._chmod:
@@ -82,6 +82,41 @@ class MultiUserFileLock(FileLock):
         if self._user is not None:
             if self._lock_file_path.owner() != self._user:
                 shutil.chown(self._lock_file_path, user=self._user)
+
+    @property
+    def is_locked(self):
+        return self._filelock.is_locked
+
+    def release(self, *args, **kwargs):
+        self._filelock.release(*args, **kwargs)
+
+    def __enter__(self):
+        self.acquire()
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        self.release()
+
+
+    @property
+    def timeout(self):
+        return self._filelock.timeout
+
+    @timeout.setter
+    def timeout(self, value):
+        self._filelock.timeout = value
+
+    @property
+    def blocking(self):
+        return self._filelock.blocking
+
+    @blocking.setter
+    def blocking(self, value):
+        self._filelock.blocking = value
+
+    @property
+    def lock_file(self):
+        return self._filelock.lock_file
 
 
 __all__ = [
