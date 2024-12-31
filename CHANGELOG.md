@@ -1,3 +1,8 @@
+## 0.0.10 (2024/12/31)
+
+- Address incompatibility with FileLock 3.15.3 causing the timeout parameter to
+  be ignored.
+
 ## 0.0.9 (2023/10/30)
 
 - Declare package incompatible with filelock 3.13.0. The problematic code was
