@@ -1,3 +1,5 @@
+import os
+import grp
 from multiuserfilelock import MultiUserFileLock, Timeout
 from threading import Thread
 from queue import Queue
@@ -63,3 +65,22 @@ def test_release_lock_from_different_thread(tmp_path):
     assert not lock_thread2.is_alive()
     lock2 = results.get(timeout=1)
     assert lock2.is_locked
+
+
+@pytest.mark.skipif(os.name == 'nt', reason='no unix groups')
+def test_nested_directories_get_group_and_mode(tmp_path):
+    groups = [g for g in os.getgroups() if g != tmp_path.stat().st_gid]
+    if not groups:
+        pytest.skip('needs membership in a second group')
+    group = grp.getgrgid(groups[0]).gr_name
+    lock_filename = tmp_path / 'a' / 'b' / 'test.lock'
+    old_umask = os.umask(0o022)
+    try:
+        lock = MultiUserFileLock(lock_filename, group=group)
+    finally:
+        os.umask(old_umask)
+    lock.acquire()
+    lock.release()
+    for directory in [tmp_path / 'a', tmp_path / 'a' / 'b']:
+        assert directory.group() == group
+        assert directory.stat().st_mode & 0o777 == 0o777
