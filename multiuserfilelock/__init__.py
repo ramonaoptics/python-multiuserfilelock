@@ -48,9 +48,7 @@ class MultiUserFileLock:
         self._filelock = FileLock(*args, **kwargs)
         self._lock_file_path = Path(self._filelock.lock_file)
         parent = self._lock_file_path.parent
-        # Even though the "other write" permissions are enabled
-        # it seems that the operating systems disables that for the /tmp dir
-        parent.mkdir(mode=0o777, parents=True, exist_ok=True)
+        self._make_directories(parent)
 
         if self._group is not None and parent.group() != self._group:
             shutil.chown(parent, group=self._group)
@@ -58,6 +56,21 @@ class MultiUserFileLock:
         # Changing the owner in the tmp directory is hard..
         if self._user is not None and parent.owner() != self._user:
             shutil.chown(parent, user=self._user)
+
+    def _make_directories(self, directory):
+        if directory.is_dir():
+            return
+        self._make_directories(directory.parent)
+        try:
+            directory.mkdir(mode=0o777)
+        except FileExistsError:
+            return
+        if os.name != 'nt':
+            directory.chmod(0o777)
+        if self._group is not None:
+            shutil.chown(directory, group=self._group)
+        if self._user is not None:
+            shutil.chown(directory, user=self._user)
 
     def acquire(self, *args, **kwargs):
         self._filelock.acquire(*args, **kwargs)

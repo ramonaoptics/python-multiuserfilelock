@@ -1,3 +1,10 @@
+## 0.1.0 (2026/11/05)
+
+- Create every missing parent directory of a lock with the requested group,
+  owner and mode `0o777`, so that other users can create locks in nested
+  directories.
+- Require Python 3.11 or newer.
+
 ## 0.0.10 (2024/12/31)
 
 - Address incompatibility with FileLock 3.15.3 causing the timeout parameter to
