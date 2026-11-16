@@ -1,3 +1,4 @@
+import shutil
 import os
 import grp
 from multiuserfilelock import MultiUserFileLock, Timeout
@@ -84,3 +85,23 @@ def test_nested_directories_get_group_and_mode(tmp_path):
     for directory in [tmp_path / 'a', tmp_path / 'a' / 'b']:
         assert directory.group() == group
         assert directory.stat().st_mode & 0o777 == 0o777
+
+
+@pytest.mark.skipif(os.name == 'nt', reason='no unix ownership')
+def test_files_of_another_user_are_left_alone(tmp_path, monkeypatch):
+    lock_filename = tmp_path / 'a' / 'test.lock'
+    lock = MultiUserFileLock(lock_filename)
+    lock.acquire()
+    lock.release()
+
+    def refuse(*args, **kwargs):
+        raise PermissionError(1, 'Operation not permitted')
+
+    monkeypatch.setattr(os, 'geteuid', lambda: os.getuid() + 1)
+    monkeypatch.setattr(shutil, 'chown', refuse)
+    lock = MultiUserFileLock(lock_filename, group='other', timeout=0.001)
+    lock.acquire()
+    other = MultiUserFileLock(lock_filename, group='other', timeout=0.001)
+    with pytest.raises(Timeout):
+        other.acquire()
+    lock.release()
