@@ -1,3 +1,9 @@
+## 0.1.1 (2026/11/16)
+
+- Only change the group or permissions of a lock directory or file that the
+  current user owns, so that a lock created by another user can still be
+  acquired.
+
 ## 0.1.0 (2026/11/05)
 
 - Create every missing parent directory of a lock with the requested group,
