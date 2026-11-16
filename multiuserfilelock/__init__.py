@@ -50,12 +50,20 @@ class MultiUserFileLock:
         parent = self._lock_file_path.parent
         self._make_directories(parent)
 
-        if self._group is not None and parent.group() != self._group:
-            shutil.chown(parent, group=self._group)
+        if self._owns(parent):
+            if self._group is not None and parent.group() != self._group:
+                shutil.chown(parent, group=self._group)
 
-        # Changing the owner in the tmp directory is hard..
-        if self._user is not None and parent.owner() != self._user:
-            shutil.chown(parent, user=self._user)
+            # Changing the owner in the tmp directory is hard..
+            if self._user is not None and parent.owner() != self._user:
+                shutil.chown(parent, user=self._user)
+
+    @staticmethod
+    def _owns(path):
+        if os.name == 'nt':
+            return True
+        euid = os.geteuid()
+        return euid == 0 or path.stat().st_uid == euid
 
     def _make_directories(self, directory):
         if directory.is_dir():
@@ -76,6 +84,8 @@ class MultiUserFileLock:
         self._filelock.acquire(*args, **kwargs)
         # once the lock has been acquired, we are more guaranteed that the
         # _lock_file exists
+        if not self._owns(self._lock_file_path):
+            return
         if self._chmod:
             desired_permissions = self._chmod
             current_permissions = self._lock_file_path.stat().st_mode
